@@ -1,0 +1,174 @@
+import java.util.Random;
+import java.util.Scanner;
+public class _11_12_20_ComparaçãoEntreMetodosOrdenaçao {
+	
+	static Random sorteio;      
+    private static long trocas  ;     
+    private static long comparacoes  ; 
+    
+    static int[] gerarDados(int quant, int[] vetAux, boolean ordenado, float proporcao){
+        float trocas = quant * proporcao;  //quantidade de trocas para bagunçar os dados
+        sorteio = new Random();
+        
+        //Vamos bagunçar o vetor, se for pedido pelo usuário.
+        if (!ordenado) { 
+            for (int i = 1; i < (int)trocas ; i++){ 
+            	//até o número de trocas calculado...
+                int pos1 = sorteio.nextInt(quant);      //sorteamos duas posições e trocamos.
+                int pos2 = sorteio.nextInt(quant);
+
+                trocar(vetAux, pos1, pos2);
+            }
+        }
+        return vetAux;
+    }
+	
+	public static void preencheVetor (int [] array) {
+		int j=0;
+		for(int i =0; i<array.length; i++ ) {
+			array[i]= j++;
+		}
+	}
+
+	public static void trocar(int[] dados, int pos1, int pos2){
+        int aux = dados[pos1];
+        dados[pos1] = dados[pos2];
+        dados[pos2] = aux;
+        trocas++;
+    }
+    
+    public static void bubbleSort(int[] dados){
+        boolean trocou;     
+        int posReferencia = dados.length - 1;    
+        do {
+            trocou = false; 
+            for(int i=0; i<posReferencia; i++) {
+            	comparacoes++;
+                if (dados[i] > dados[i+1]) {
+                	
+                    trocar(dados, i, (i+1)); 
+                    trocou = true;          
+                }
+            }
+            posReferencia--;    
+        } while (trocou);       
+    }
+	
+	public static void insertionSort(int[] dados){
+        for(int posRef = 1; posRef < dados.length; posRef++){  //a partir do segundo elemento (posição 1)...
+            int posComp = posRef - 1;                           //auxiliar para comparação com o elemento de referência
+            int dadoRef = dados[posRef];                        //auxiliar para guardar o elemento de referência
+            comparacoes++;
+            while (posComp >= 0 && dadoRef < dados[posComp])  //enquanto o elemento de referência for menor e houver vetor, recua uma posição
+                posComp--;
+            
+            //posição encontrada. Copiar todos os elementos entre a posição de referência e o fim da comparação "para a frente"
+            //note que não é uma troca: cópia é mais barato para o algoritmo (1 operação contra 3)
+            for (int posCopia = posRef; posCopia > (posComp+1); posCopia--)
+                dados[posCopia] = dados[posCopia - 1];
+            
+            //inserimos o dado de referência em sua posição correta
+            dados[posComp + 1] = dadoRef;
+
+        }
+    }        
+	
+	
+		
+	public static void shellSort(int [] vet) {
+		int size = vet.length;
+	    int i , j , value;
+	    int gap = 1;
+	    while(gap < size) {
+	        gap = 3*gap+1;
+	    }
+	    while ( gap > 1) {
+	        gap /= 3;
+	        for(i = gap; i < size; i++) {
+	            value = vet[i];
+	            j = i - gap;
+	            while (j >= 0 && value < vet[j]) {
+	                vet [j + gap] = vet[j];
+	                j -= gap;
+	            }
+	            vet [j + gap] = value;
+	        }
+	    }
+	}
+	
+	public static int particionar(int[] dados, int inicio, int fim){
+        int pivot = dados[fim];         
+        int particao = inicio - 1;     
+        
+        for(int i=inicio ; i<fim; i++){ 
+             comparacoes++;   
+            if (dados[i] < pivot){       
+                particao++;
+                trocar(dados, i, particao);
+            }
+        }
+        particao++;   
+        trocar(dados, fim, particao);
+        return particao;
+    }
+
+    /**
+     * Método recursivo para ordenação crescente com Quicksort
+     * @param dados Dados (array) a serem ordenados
+     * @param inicio Início inclusivo dos dados (para a recursividade)
+     * @param fim Final inclusivo dos dados (para a recursividade)
+     */
+	
+    public static void quickSort(int[] dados, int inicio, int fim){
+        if (inicio < fim){                                      //array de tamanho 2 ou maior (inicio é antes do fim)
+            int particao = particionar(dados, inicio, fim);     //chamada da partição para os dados
+            quickSort(dados, inicio, particao - 1);             //recursividade: metade inicial (esquerda)
+            quickSort(dados, particao + 1, fim);                //recursividade: metade final (direita)
+        }
+    }
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+		Scanner sc = new Scanner(System.in);	
+		
+		
+	
+		int quant = 20000;
+		int [] array = new int [quant];
+		
+		
+	
+		
+		long maior = 0;
+		long menor = Integer.MAX_VALUE;
+		
+		
+		for(int i = 1; i<=1; i++) {
+			preencheVetor(array);
+			gerarDados(quant, array, false, quant);
+			long tempoInicial = System.nanoTime();
+			
+			//TROQUE O METODO PARA VERIFICAR SEU TEMPO DE EXECUCAO
+			shellSort(array);
+			
+			long tempoFinal = System.nanoTime();
+			long num = tempoFinal - tempoInicial;
+			System.out.println(num);
+			if (num>maior){
+				 maior=num;
+				}
+				 
+			if(num<menor){
+				 menor=num;
+				}
+			}
+		System.out.println("O maior numero e: " + maior);
+		System.out.println("O menor numero e: " + menor);
+		
+		System.out.println(trocas);
+		System.out.println(comparacoes);
+		
+
+	}
+
+}
